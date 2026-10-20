@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><title>@yield('title','لوحة المتابعة') | IBN</title>
-<link rel="stylesheet" href="{{ asset('assets/app.css') }}"><script src="{{ asset('assets/app.js') }}" defer></script></head>
+<link rel="stylesheet" href="{{ asset('assets/app.css') }}"><link rel="stylesheet" href="{{ asset('assets/responsive.css') }}"><script src="{{ asset('assets/app.js') }}" defer></script></head>
 <body>
 @php($me=auth()->user())
 <a href="#main" class="skip-link">انتقل إلى المحتوى</a>

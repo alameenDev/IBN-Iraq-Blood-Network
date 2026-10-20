@@ -12,3 +12,5 @@ function updateFacility() {
  wrapper.hidden=national; const select=wrapper.querySelector("select"); select.disabled=national; select.required=!national;
 }
 roleSelect?.addEventListener("change",updateFacility); updateFacility();
+
+document.querySelectorAll(".table-wrap").forEach(wrapper=>{wrapper.tabIndex=0;wrapper.setAttribute("role","region");wrapper.setAttribute("aria-label","جدول بيانات؛ يمكن تمريره أفقياً عند الحاجة");});

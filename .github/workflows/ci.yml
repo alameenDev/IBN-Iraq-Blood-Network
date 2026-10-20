@@ -75,3 +75,28 @@ jobs:
             composer.lock
             storage/logs/laravel.log
           retention-days: 7
+
+  freeze-tested-lock:
+    name: Freeze tested dependency lock
+    needs: test
+    if: github.event_name == 'push' && github.repository == 'alameenDev/IBN-Iraq-Blood-Network' && github.ref == 'refs/heads/feat/ibn-foundation-mysql'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ibn-test-results
+          path: /tmp/ibn-tested-results
+      - name: Commit only the successfully tested dependency lock
+        run: |
+          if test -f composer.lock; then exit 0; fi
+          test -s /tmp/ibn-tested-results/composer.lock
+          cp /tmp/ibn-tested-results/composer.lock composer.lock
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- composer.lock
+          git commit -m "build: lock dependencies verified by MySQL and browser CI"
+          git push origin HEAD:refs/heads/feat/ibn-foundation-mysql
