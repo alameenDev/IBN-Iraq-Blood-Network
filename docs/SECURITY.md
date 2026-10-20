@@ -12,4 +12,4 @@ No real secrets, donor data, backups or production `.env` may be committed. Publ
 
 Missing before real deployment: MFA/SSO, centrally controlled onboarding and account recovery, retention/erasure policies, validated consent text, penetration test, vulnerability management process, backup/restore validation, monitoring, secret rotation tooling, trusted reverse-proxy configuration, incident response, clinical validation, cross-site donor deferral governance and legal approval. The PHP/MySQL server, TLS, disk/database encryption, backups and physical network are outside this code's guarantees.
 
-Review dependencies and lock versions after a successful connected installation. Do not expose an unsupported PHP runtime. Keep private vulnerability reports out of a public issue if they contain sensitive data.
+Dependency versions are pinned in composer.lock from the tested installation. Review advisories regularly and validate dependency upgrades in staging. Do not expose an unsupported PHP runtime. Keep private vulnerability reports out of a public issue if they contain sensitive data.
