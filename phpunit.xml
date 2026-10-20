@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.0/phpunit.xsd" bootstrap="vendor/autoload.php" colors="true" cacheDirectory=".phpunit.cache">
+ <testsuites><testsuite name="IBN"><directory>tests/Feature</directory></testsuite></testsuites>
+ <php><env name="APP_ENV" value="testing"/><env name="APP_KEY" value="base64:MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE="/>
+ <env name="IDENTITY_HASH_KEY" value="test-only-identity-key-never-for-production"/>
+ <env name="BCRYPT_ROUNDS" value="4"/><env name="CACHE_STORE" value="array"/><env name="SESSION_DRIVER" value="array"/>
+ <env name="SESSION_SECURE_COOKIE" value="false"/><env name="DB_CONNECTION" value="sqlite"/><env name="DB_DATABASE" value=":memory:"/>
+ </php>
+</phpunit>
