@@ -1,0 +1,9 @@
+@extends('layout')
+@section('title','طلبات الدم')
+@section('subtitle','طلبات إدارية للتنسيق مع المصرف المرتبط. لا تمثل حجزاً أو صرفاً لوحدات دم.')
+@section('actions')@if(auth()->user()->allowed('requests.create'))<a class="btn btn-primary" href="{{ route('requests.create') }}"><x-icon name="plus"/>طلب دم جديد</a>@endif@endsection
+@section('content')
+<form class="filter-bar" method="get"><label class="search-field"><x-icon name="search"/><input name="q" value="{{ request('q') }}" aria-label="رقم الطلب" placeholder="ابحث برقم الطلب" maxlength="50"></label><select name="status" aria-label="حالة الطلب"><option value="">كل الحالات</option>@foreach(['submitted','accepted','rejected','cancelled'] as $s)<option value="{{ $s }}" @selected(request('status')===$s)>{{ \App\Support\Catalog::label($s) }}</option>@endforeach</select><button class="btn btn-light">تصفية</button></form>
+<div class="panel"><div class="table-wrap"><table><thead><tr><th>رقم الطلب / المستشفى</th><th>المصرف المستلم</th><th>المكون والكمية</th><th>وقت الاحتياج</th><th>الأولوية</th><th>الحالة</th></tr></thead><tbody>
+@forelse($requests as $r)<tr><td><a class="table-title mono" href="{{ route('requests.show',$r) }}">{{ $r->reference }}</a><small>{{ $r->hospital->name }}</small></td><td>{{ $r->bank->name }}</td><td><strong dir="ltr">{{ $r->component }} / {{ $r->blood_group==='unknown'?'?':$r->blood_group }}</strong><small>{{ $r->quantity }} وحدة مطلوبة</small></td><td>{{ $r->needed_at->timezone('Asia/Baghdad')->format('d/m/Y H:i') }}</td><td><x-status :value="$r->priority"/></td><td><x-status :value="$r->status"/></td></tr>@empty<tr><td colspan="6"><div class="empty-state"><x-icon name="requests"/><strong>لا توجد طلبات مطابقة</strong><p>الطلب الجديد يحتاج رابطاً فعالاً مع مصرف رئيسي.</p></div></td></tr>@endforelse
+</tbody></table></div><x-pager :items="$requests"/></div>@endsection

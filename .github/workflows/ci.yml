@@ -1,0 +1,77 @@
+name: IBN checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: ibn_test
+          MYSQL_USER: ibn_ci
+          MYSQL_PASSWORD: ci-only-password
+          MYSQL_ROOT_PASSWORD: ci-only-root-password
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pci-only-root-password"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: ibn_test
+      DB_USERNAME: ibn_ci
+      DB_PASSWORD: ci-only-password
+      SESSION_SECURE_COOKIE: 'false'
+      IDENTITY_HASH_KEY: ci-only-independent-identity-key-not-for-production
+      IBN_BROWSER_PASSWORD: BrowserTestOnly!Password123
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, dom, xml, pdo_mysql, pdo_sqlite, curl, fileinfo
+          coverage: none
+          tools: composer:v2
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          mkdir -p bootstrap/cache storage/framework/{cache/data,sessions,views} storage/logs
+          composer install --prefer-dist --no-interaction
+          php artisan key:generate
+      - name: Syntax and integration tests on MySQL
+        env:
+          APP_ENV: testing
+        run: |
+          mkdir -p build
+          find app config database routes -name '*.php' -print0 | xargs -0 -n1 php -l
+          vendor/bin/phpunit --log-junit build/junit.xml
+          php artisan view:cache
+          php artisan route:cache
+          php artisan optimize:clear
+      - name: Prepare browser data
+        env:
+          APP_ENV: testing
+        run: |
+          php artisan migrate:fresh --force
+          php tests/browser/prepare.php
+      - name: Browser and responsive smoke test
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+          APP_ENV=local php artisan serve --host=127.0.0.1 --port=8000 > /tmp/ibn-server.log 2>&1 &
+          for i in $(seq 1 30); do curl --fail --silent http://127.0.0.1:8000/login > /dev/null && break; sleep 1; done
+          python tests/browser/smoke.py
+      - name: Dependency security audit
+        run: composer audit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ibn-test-results
+          path: |
+            build/
+            composer.lock
+            storage/logs/laravel.log
+          retention-days: 7

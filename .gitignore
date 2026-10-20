@@ -1,0 +1,17 @@
+/vendor/
+/.env
+/.env.*
+!/.env.example
+/.phpunit.cache/
+/bootstrap/cache/*.php
+/storage/**/*.log
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/framework/cache/data/*
+/database/*.sqlite
+/public/hot
+/node_modules/
+/tests/browser/__pycache__/
+!**/.gitkeep
+
+/build/
